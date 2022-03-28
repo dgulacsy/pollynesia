@@ -1,6 +1,6 @@
 {% extends "pollynesia_site/base.html" %}
 
-{% block page_content %}
+{% block content %}
     <form action="{% url 'polls:vote' question.id %}" method="post">
         {% csrf_token %}
         <fieldset>

@@ -45,6 +45,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'users.apps.UsersConfig',
     'polls.apps.PollsConfig',
     'pollynesia_site',
     'django.contrib.admin',
