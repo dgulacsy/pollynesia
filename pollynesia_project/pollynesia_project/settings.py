@@ -145,6 +145,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'polls:index'
+LOGIN_URL = 'login'
 
 # Crispy settings
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
