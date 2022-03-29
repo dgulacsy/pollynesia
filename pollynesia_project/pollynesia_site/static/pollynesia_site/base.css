@@ -1,19 +1,24 @@
 body {
-background: #fafafa;
-color: #333333;
-margin-top: 5rem;
+    background: #fafafa;
+    color: #333333;
+    margin-top: 5rem;
 }
 
-h1, h2, h3, h4, h5, h6 {
-color: #444444;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #444444;
 }
 
 ul {
-margin: 0;
+    margin: 0;
 }
 
 .bg-steel {
-background-color: #686868;
+    background-color: #686868;
 }
 
 .content-section {
@@ -22,7 +27,7 @@ background-color: #686868;
     border: 1px solid #dddddd;
     border-radius: 3px;
     margin-bottom: 20px;
-  }
+}
 
 .footer {
     position: absolute;
@@ -34,16 +39,22 @@ background-color: #686868;
 }
 
 .table-row {
-    cursor:pointer;
-    }
+    cursor: pointer;
+}
 
 .account-img {
     height: 125px;
     width: 125px;
     margin-right: 20px;
     margin-bottom: 16px;
-    }
+}
 
 .account-heading {
-font-size: 2.5rem;
+    font-size: 2.5rem;
+}
+
+.poll-img {
+    height: 65px;
+    width: 65px;
+    margin-right: 16px;
 }
