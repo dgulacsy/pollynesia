@@ -1,12 +1,13 @@
 {% extends "pollynesia_site/base.html" %}
 
 {% block content %}
-    {% if latest_question_list %}
+    {% if latest_poll_list %}
         <table class='table table-hover'>
-            {% for question in latest_question_list %}
-                    <tr class="table-row" data-href="{% url 'polls:detail' question.id %}">
-                        <td>{{ question.question_text }}</td>
-                        <td>{{ question.pub_date }}</td>
+            {% for poll in latest_poll_list %}
+                    <tr class="table-row" data-href="{% url 'polls:detail' poll.id %}">
+                        <td>{{ poll.title }}</td>
+                        <td>{{ poll.pub_date|date:"F d, Y" }}</td>
+                        <td>{% if poll.is_open %}Open {% else %} Closed {% endif %}</td>
                     </tr>
             {% endfor %}
         </table>

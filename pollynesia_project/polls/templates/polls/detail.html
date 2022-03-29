@@ -1,17 +1,25 @@
 {% extends "pollynesia_site/base.html" %}
 
 {% block content %}
-    <form action="{% url 'polls:vote' question.id %}" method="post">
+    <form action="{% url 'polls:vote' poll.id %}" method="post">
         {% csrf_token %}
         <fieldset>
-            <legend>
-                <h1>{{ question.question_text }}</h1>
+            <h1>{{ poll.user.username }}'s poll</h1>
+            {% if no_name_error_message %}
+            <p><strong>{{ no_name_error_message }}</strong></p>{% endif %} 
+            <input type="text" name="voter_name" id="voter_name" placeholder="your name" maxlength="50">
+            <legend class="poll-title">
+                <h2>{{ poll.title }}</h2>
             </legend>
-            {% if error_message %}
-            <p><strong>{{ error_message }}</strong></p>{% endif %} {% for choice in question.choice_set.all %}
+            {% if selection_error_message %}
+            <p><strong>{{ selection_error_message }}</strong></p>{% endif %} 
+            <br>
+            {% for choice in poll.choice_set.all %}
             <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br> {% endfor %}
+            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br> 
+            {% endfor %}
         </fieldset>
+        <br>
         <input type="submit" value="Vote">
     </form>
 {% endblock %}
