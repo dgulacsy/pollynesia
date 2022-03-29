@@ -5,6 +5,12 @@
         <img class="rounded-circle poll-img" src="{{ poll.user.profile.image.url }}" alt="profile picture">
         <small><p>created by {{ poll.user.username }}</p></small>
     </div>
+    <div class="poll-controls">
+        {% if object.user == user %}
+            <a href="{% url 'polls:update' object.id%}" class="btn btn-secondary btn-sm mt-1 mb-1">Update</a>
+            <a href="{% url 'polls:delete' object.id%}" class="btn btn-danger btn-sm mt-1 mb-1">Delete</a>
+        {% endif %}
+    </div>
     <form action="{% url 'polls:vote' poll.id %}" method="post">
         {% csrf_token %}
         <fieldset>
@@ -15,6 +21,7 @@
                 <input type="text" name="voter_name" id="voter_name" placeholder="your name" maxlength="50">
                 <legend class="poll-title">
                     <h2>{{ poll.title }}</h2>
+                    <small><p class="poll-description">{{ poll.description }}</p></small>
                 </legend>
                 {% if selection_error_message %}
                 <p><strong>{{ selection_error_message }}</strong></p>{% endif %} 

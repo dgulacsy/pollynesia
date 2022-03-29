@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.views import generic
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from .models import Poll, Choice, Vote
 
@@ -31,6 +32,36 @@ class ResultsView(generic.DetailView):
     model = Poll
     template_name = 'polls/results.html'
 
+
+class CreateView(LoginRequiredMixin, generic.CreateView):
+    model = Poll
+    fields = ['title', 'description', 'location', 'open_from', 'close_at']
+    template_name = 'polls/poll_form.html'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+    model = Poll
+    fields = ['title', 'description', 'location', 'open_from', 'close_at']
+    template_name = 'polls/poll_form.html'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+    def test_func(self):
+        poll = self.get_object()
+        return self.request.user == poll.user
+
+class DeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+    model = Poll
+    success_url = '/polls'
+
+    def test_func(self):
+        poll = self.get_object()
+        return self.request.user == poll.user
 
 def vote(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
