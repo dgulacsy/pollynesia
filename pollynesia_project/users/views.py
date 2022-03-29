@@ -8,7 +8,7 @@ def signup(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
-            messages.success(request, f'Thank you for creating an account, {username}!')
+            messages.success(request, f'Your account has been created, {username}! You can log in now!')
             return redirect('polls:index')
     else:
         form = UserSignupForm()
