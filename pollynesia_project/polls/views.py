@@ -12,6 +12,7 @@ from .models import Poll, Choice, Vote
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
     context_object_name = 'latest_poll_list'
+    paginate_by = 10
 
     def get_queryset(self):
         """Return the last five published polls."""
