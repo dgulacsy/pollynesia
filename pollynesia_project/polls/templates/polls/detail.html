@@ -3,7 +3,9 @@
 {% block content %}
     <div class="owner-data">
         <img class="rounded-circle poll-img" src="{{ poll.user.profile.image.url }}" alt="profile picture">
-        <small><p>created by {{ poll.user.username }}</p></small>
+        <small><p>created by 
+            <a href="{% url 'polls:user-polls' poll.user.username %}">{{ poll.user }}</a>
+        </p></small>
     </div>
     <div class="poll-controls">
         {% if object.user == user %}

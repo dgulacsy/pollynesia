@@ -1,9 +1,10 @@
 {% extends "pollynesia_site/base.html" %}
 
 {% block content %}
-    {% if latest_poll_list %}
+    <h1 class="mb-3">Posts by {{view.kwargs.username }} ({{ page_obj.paginator.count }})</h1>
+    {% if polls %}
         <table class='table table-hover'>
-            {% for poll in latest_poll_list %}
+            {% for poll in polls %}
                     <tr class="table-row" data-href="{% url 'polls:detail' poll.id %}">
                         <td><a href="{% url 'polls:user-polls' poll.user.username %}">{{ poll.user }}</a></td>
                         <td>{{ poll.title }}</td>
