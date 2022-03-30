@@ -95,7 +95,6 @@ class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
     model = Poll
     template_name = 'polls/poll_form.html'
     form_class = PollForm
-    success_url = "/polls"
 
     def __init__(self):
         self.ChoiceFormset = inlineformset_factory(Poll, Choice, fields=('choice_text',), extra=0)
@@ -115,6 +114,8 @@ class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
             request.POST, instance=self.object)
         if choice_formset.is_valid() and poll_form.is_valid():
             return self.form_valid(choice_formset, poll_form)
+        else:
+            HttpResponseRedirect(reverse('polls:update', args=(self.object.id,)))
 
     def form_valid(self, formset, poll_form):
         print('form_valid')
