@@ -56,26 +56,27 @@ class PollForm(ModelForm):
         fields = ['title', 'description', 'location', 'open_from', 'close_at']
 
 
-ChoiceFormset = inlineformset_factory(
-    Poll, Choice, fields=('choice_text',), extra=2)
-
-
 class CreateView(LoginRequiredMixin, generic.CreateView):
     model = Poll
     template_name = 'polls/poll_form.html'
     form_class = PollForm
     success_url = "/polls"
+    
+    def __init__(self):
+        self.ChoiceFormset = inlineformset_factory(Poll, Choice, fields=('choice_text',), extra=3)
+        super().__init__()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = PollForm()
-        context['formset'] = ChoiceFormset()
+        context['formset'] = self.ChoiceFormset()
         return context
 
     def post(self, request, *args, **kwargs):
         poll_form = PollForm(data=request.POST)
-        choice_formset = ChoiceFormset(
+        choice_formset = self.ChoiceFormset(
             request.POST, instance=poll_form.instance)
+        print(choice_formset.is_valid(), poll_form.is_valid())
         if choice_formset.is_valid() and poll_form.is_valid():
             return self.form_valid(choice_formset, poll_form)
 
@@ -92,12 +93,35 @@ class CreateView(LoginRequiredMixin, generic.CreateView):
 
 class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
     model = Poll
-    fields = ['title', 'description', 'location', 'open_from', 'close_at']
     template_name = 'polls/poll_form.html'
+    form_class = PollForm
+    success_url = "/polls"
 
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+    def __init__(self):
+        self.ChoiceFormset = inlineformset_factory(Poll, Choice, fields=('choice_text',), extra=0)
+        super().__init__()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = PollForm(instance=self.object)
+        context['formset'] = self.ChoiceFormset(instance=self.object)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        print('running post')
+        poll_form = PollForm(data=request.POST, instance=self.object)
+        choice_formset = self.ChoiceFormset(
+            request.POST, instance=self.object)
+        if choice_formset.is_valid() and poll_form.is_valid():
+            return self.form_valid(choice_formset, poll_form)
+
+    def form_valid(self, formset, poll_form):
+        print('form_valid')
+        poll_form.instance.user = self.request.user
+        self.object = poll_form.save()
+        formset.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     def test_func(self):
         poll = self.get_object()
