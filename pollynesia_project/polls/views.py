@@ -1,3 +1,4 @@
+from re import template
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
@@ -16,7 +17,7 @@ class IndexView(generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        """Return the published polls of logged in user"""
+        """Return the last 5 published polls of logged in user"""
         return Poll.objects.filter(
             pub_date__lte=timezone.now()
         ).order_by('-pub_date')[:5]
