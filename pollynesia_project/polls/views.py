@@ -1,4 +1,3 @@
-from re import template
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
@@ -6,6 +5,7 @@ from django.views import generic
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.forms import inlineformset_factory, ModelForm
 
 from .models import Poll, Choice, Vote
 
@@ -49,15 +49,45 @@ class ResultsView(generic.DetailView):
     model = Poll
     template_name = 'polls/results.html'
 
+class PollForm(ModelForm):
+    class Meta:
+        model = Poll
+        fields = ['title', 'description', 'location', 'open_from', 'close_at']
+
+ChoiceFormset = inlineformset_factory(Poll, Choice, fields=('choice_text',), extra=1)
 
 class CreateView(LoginRequiredMixin, generic.CreateView):
     model = Poll
-    fields = ['title', 'description', 'location', 'open_from', 'close_at']
     template_name = 'polls/poll_form.html'
+    form_class = PollForm
+    
 
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = PollForm()
+        context['formset'] = ChoiceFormset()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        poll_form = PollForm(data=request.POST)
+        choice_formset = ChoiceFormset(request.POST)
+        if choice_formset.is_valid() and poll_form.is_valid():
+            return self.form_valid(choice_formset, poll_form)
+
+    def form_valid(self, formset, poll_form):
+        print(self.request.user)
+        poll_form.instance.user = self.request.user
+        poll_form.save()
+        choice_forms = formset.save(commit=False)
+        for choice_form in choice_forms:
+            choice_form.user = self.request.user
+            choice_form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    # def form_valid(self, formset, poll_form):
+    #     poll_form.instance.user = self.request.user
+    #     formset.instance.user = self.request.user
+    #     return super().form_valid(formset)
 
 
 class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
