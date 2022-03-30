@@ -4,7 +4,7 @@
     <div class="owner-data">
         <img class="rounded-circle poll-img" src="{{ poll.user.profile.image.url }}" alt="profile picture">
         <small><p>created by 
-            <a href="{% url 'polls:user-polls' poll.user.username %}">{{ poll.user }}</a>
+            <a href="{% url 'polls:user_polls' poll.user.username %}">{{ poll.user }}</a>
         </p></small>
     </div>
     <div class="poll-controls">

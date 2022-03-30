@@ -5,7 +5,7 @@
         <table class='table table-hover'>
             {% for poll in latest_poll_list %}
                     <tr class="table-row" data-href="{% url 'polls:detail' poll.id %}">
-                        <td><a href="{% url 'polls:user-polls' poll.user.username %}">{{ poll.user }}</a></td>
+                        <td><a href="{% url 'polls:user_polls' poll.user.username %}">{{ poll.user }}</a></td>
                         <td>{{ poll.title }}</td>
                         <td>{{ poll.pub_date|date:"F d, Y" }}</td>
                         <td>{% if poll.is_open %}Open {% else %} Closed {% endif %}</td>

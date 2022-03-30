@@ -23,12 +23,12 @@ from django.core.exceptions import ImproperlyConfigured
 with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
     secrets = json.load(secrets_file)
 
-def get_secret(setting, secrets=secrets):
+def get_secret(varname, secrets=secrets):
     """Get secret setting or fail with ImproperlyConfigured"""
     try:
-        return secrets[setting]
+        return secrets[varname]
     except KeyError:
-        raise ImproperlyConfigured("Set the {} setting".format(setting))
+        raise ImproperlyConfigured("Set the {} setting".format(varname))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -149,6 +149,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'polls:index'
 LOGIN_URL = 'login'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = get_secret('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
+
 
 # Crispy settings
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
