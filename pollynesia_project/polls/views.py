@@ -49,18 +49,22 @@ class ResultsView(generic.DetailView):
     model = Poll
     template_name = 'polls/results.html'
 
+
 class PollForm(ModelForm):
     class Meta:
         model = Poll
         fields = ['title', 'description', 'location', 'open_from', 'close_at']
 
-ChoiceFormset = inlineformset_factory(Poll, Choice, fields=('choice_text',), extra=1)
+
+ChoiceFormset = inlineformset_factory(
+    Poll, Choice, fields=('choice_text',), extra=2)
+
 
 class CreateView(LoginRequiredMixin, generic.CreateView):
     model = Poll
     template_name = 'polls/poll_form.html'
     form_class = PollForm
-    
+    success_url = "/polls"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -70,24 +74,20 @@ class CreateView(LoginRequiredMixin, generic.CreateView):
 
     def post(self, request, *args, **kwargs):
         poll_form = PollForm(data=request.POST)
-        choice_formset = ChoiceFormset(request.POST)
+        choice_formset = ChoiceFormset(
+            request.POST, instance=poll_form.instance)
         if choice_formset.is_valid() and poll_form.is_valid():
             return self.form_valid(choice_formset, poll_form)
 
     def form_valid(self, formset, poll_form):
-        print(self.request.user)
+        self.object = poll_form
         poll_form.instance.user = self.request.user
         poll_form.save()
         choice_forms = formset.save(commit=False)
+        print(choice_forms)
         for choice_form in choice_forms:
-            choice_form.user = self.request.user
             choice_form.save()
         return HttpResponseRedirect(self.get_success_url())
-
-    # def form_valid(self, formset, poll_form):
-    #     poll_form.instance.user = self.request.user
-    #     formset.instance.user = self.request.user
-    #     return super().form_valid(formset)
 
 
 class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
