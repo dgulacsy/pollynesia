@@ -1,5 +1,6 @@
 from .utils import download
 from .models import Poll, Choice, Vote
+from .api_consumer import get_client_ip, get_location_from_ip
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
@@ -7,7 +8,7 @@ from django.urls import reverse
 from django.views import generic
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.forms import inlineformset_factory, ModelForm
 import logging
@@ -83,7 +84,6 @@ class CreateView(LoginRequiredMixin, generic.CreateView):
         self.object = poll_form
         choice_formset = self.ChoiceFormset(
             request.POST, instance=poll_form.instance)
-        print(choice_formset.is_valid(), poll_form.is_valid())
         if choice_formset.is_valid() and poll_form.is_valid():
             return self.form_valid(choice_formset, poll_form)
         else:
@@ -94,7 +94,6 @@ class CreateView(LoginRequiredMixin, generic.CreateView):
         poll_form.instance.user = self.request.user
         poll_form.save()
         choice_forms = formset.save(commit=False)
-        print(choice_forms)
         for choice_form in choice_forms:
             choice_form.save()
         return HttpResponseRedirect(self.get_success_url())
@@ -118,7 +117,6 @@ class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        print('running post')
         poll_form = PollForm(data=request.POST, instance=self.object)
         choice_formset = self.ChoiceFormset(
             request.POST, instance=self.object)
@@ -129,7 +127,6 @@ class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
                 reverse('polls:update', args=(self.object.id,)))
 
     def form_valid(self, formset, poll_form):
-        print('form_valid')
         poll_form.instance.user = self.request.user
         self.object = poll_form.save()
         formset.save()
