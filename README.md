@@ -5,8 +5,9 @@ Pollynesia is a web application for creating polls of various kind. It is based 
 ## Setup
 1. Clone this GitHub repository
 2. Install Docker
-3. Go to the cloned repository (the directory where the Dockerfile is), create a `.env` file 
-4. Add your IPstack API key and save.
+3. Create a free IPstack API key at https://ipstack.com/product.
+4. Go to the cloned repository (the directory where the Dockerfile is), create a `.env` file
+5. Add your IPstack API key and save. (Required to fill in location form field based on the client's IP address)
   ```
   IPSTACK_API_KEY=YOUR_API_KEY
   ```
@@ -15,4 +16,4 @@ Pollynesia is a web application for creating polls of various kind. It is based 
 7. Run `python manage.py makemigrations`
 8. Run `python manage.py migrate`
 
-By now your Django server should be up and running on http://0.0.0.0:8000/.
+By now your Django server should be up and running on http://localhost:8000/.
