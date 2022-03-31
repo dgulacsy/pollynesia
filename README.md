@@ -12,8 +12,5 @@ Pollynesia is a web application for creating polls of various kind. It is based 
   IPSTACK_API_KEY=YOUR_API_KEY
   ```
 5. Open a terminal and run `docker compose up`
-6. Attach a shell to the created pollynesa_web container
-7. Run `python manage.py makemigrations`
-8. Run `python manage.py migrate`
 
 By now your Django server should be up and running on http://localhost:8000/.
