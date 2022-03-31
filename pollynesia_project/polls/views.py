@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views import generic
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -8,6 +8,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.forms import inlineformset_factory, ModelForm
 
 from .models import Poll, Choice, Vote
+
+import csv
 
 
 class IndexView(generic.ListView):
@@ -61,9 +63,10 @@ class CreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'polls/poll_form.html'
     form_class = PollForm
     success_url = "/polls"
-    
+
     def __init__(self):
-        self.ChoiceFormset = inlineformset_factory(Poll, Choice, fields=('choice_text',), extra=3)
+        self.ChoiceFormset = inlineformset_factory(
+            Poll, Choice, fields=('choice_text',), extra=3)
         super().__init__()
 
     def get_context_data(self, **kwargs):
@@ -97,7 +100,8 @@ class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
     form_class = PollForm
 
     def __init__(self):
-        self.ChoiceFormset = inlineformset_factory(Poll, Choice, fields=('choice_text',), extra=0)
+        self.ChoiceFormset = inlineformset_factory(
+            Poll, Choice, fields=('choice_text',), extra=0)
         super().__init__()
 
     def get_context_data(self, **kwargs):
@@ -115,7 +119,8 @@ class UpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
         if choice_formset.is_valid() and poll_form.is_valid():
             return self.form_valid(choice_formset, poll_form)
         else:
-            HttpResponseRedirect(reverse('polls:update', args=(self.object.id,)))
+            HttpResponseRedirect(
+                reverse('polls:update', args=(self.object.id,)))
 
     def form_valid(self, formset, poll_form):
         print('form_valid')
@@ -160,3 +165,16 @@ def vote(request, poll_id):
         vote = Vote(choice=selected_choice, voter_name=voter_name)
         vote.save()
         return HttpResponseRedirect(reverse('polls:results', args=(poll.id,)))
+
+
+def download_votes_csv(request, poll_id):
+    poll = get_object_or_404(Poll, pk=poll_id)
+    votes_qs = Vote.objects.all().filter(choice__poll=poll)
+    field_names = [field.name for field in Vote._meta.get_fields()]
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment;filename=votes.csv'
+    writer = csv.writer(response)
+    writer.writerow(field_names)
+    for vote in votes_qs:
+        writer.writerow([getattr(vote, name) for name in field_names])
+    return response
