@@ -1,6 +1,8 @@
 # Custom
 pollynesia_project/media
 pollynesia_project/secrets.json
+data
+
 *.DS_Store
 
 # Byte-compiled / optimized / DLL files
