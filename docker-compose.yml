@@ -1,9 +1,9 @@
 version: "3.9"
-   
+
 services:
   db:
     image: postgres:latest
-    ports: 
+    ports:
       - "5432"
     volumes:
       - ./data/db:/var/lib/postgresql/data
@@ -22,5 +22,6 @@ services:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - IPSTACK_API_KEY=${IPSTACK_API_KEY}
     depends_on:
       - db
