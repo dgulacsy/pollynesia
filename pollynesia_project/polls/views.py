@@ -1,16 +1,18 @@
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.http import HttpResponseRedirect, HttpResponse
-from django.views import generic
 from django.utils import timezone
+from django.http import HttpResponseRedirect, HttpResponse
+from django.urls import reverse
+from django.views import generic
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
 from django.forms import inlineformset_factory, ModelForm
+
 
 from .models import Poll, Choice, Vote
 
-import csv
-
+from .utils import download
 
 class IndexView(generic.ListView):
     model = Poll
@@ -77,14 +79,17 @@ class CreateView(LoginRequiredMixin, generic.CreateView):
 
     def post(self, request, *args, **kwargs):
         poll_form = PollForm(data=request.POST)
+        self.object = poll_form
         choice_formset = self.ChoiceFormset(
             request.POST, instance=poll_form.instance)
         print(choice_formset.is_valid(), poll_form.is_valid())
         if choice_formset.is_valid() and poll_form.is_valid():
             return self.form_valid(choice_formset, poll_form)
+        else:
+            messages.warning(request, 'Invalid form! Please try again!')
+            return self.form_invalid(choice_formset)
 
     def form_valid(self, formset, poll_form):
-        self.object = poll_form
         poll_form.instance.user = self.request.user
         poll_form.save()
         choice_forms = formset.save(commit=False)
@@ -145,36 +150,25 @@ class DeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
 
 def vote(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
-    retry = False
     context = {
         'poll': poll,
     }
     try:
         voter_name = request.POST['voter_name']
-        if not voter_name:
-            retry = True
-            context['no_name_error_message'] = "Please add your name"
         selected_choice = poll.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
-        retry = True
-        context['selection_error_message'] = "You didn't select a choice"
-    if retry:
-        print(context)
-        return render(request, 'polls/detail.html', context=context)
+        messages.warning(request, 'Please select a choice!')
+        # context['selection_error_message'] = "You didn't select a choice"
+        # print(context)
+        return HttpResponseRedirect(reverse('polls:detail', args=(poll.id,)))
     else:
         vote = Vote(choice=selected_choice, voter_name=voter_name)
         vote.save()
         return HttpResponseRedirect(reverse('polls:results', args=(poll.id,)))
 
-
-def download_votes_csv(request, poll_id):
+@login_required
+def download_votes(request, poll_id, format='csv'):
     poll = get_object_or_404(Poll, pk=poll_id)
-    votes_qs = Vote.objects.all().filter(choice__poll=poll)
-    field_names = [field.name for field in Vote._meta.get_fields()]
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment;filename=votes.csv'
-    writer = csv.writer(response)
-    writer.writerow(field_names)
-    for vote in votes_qs:
-        writer.writerow([getattr(vote, name) for name in field_names])
+    votes_queryset = Vote.objects.all().filter(choice__poll=poll)
+    response = download(votes_queryset, format)
     return response

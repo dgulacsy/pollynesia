@@ -8,7 +8,7 @@
                         <td><a href="{% url 'polls:user_polls' poll.user.username %}">{{ poll.user }}</a></td>
                         <td>{{ poll.title }}</td>
                         <td>{{ poll.pub_date|date:"F d, Y" }}</td>
-                        <td>{% if poll.is_open %}Open {% else %} Closed {% endif %}</td>
+                        <td>{% if poll.is_open %} Open {% else %} Closed {% endif %}</td>
                     </tr>
             {% endfor %}
         </table>

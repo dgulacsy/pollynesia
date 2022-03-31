@@ -1,6 +1,7 @@
 {% extends "pollynesia_site/base.html" %}
 
 {% block content %}
+<div class="content-section">
     <div class="owner-data">
         <img class="rounded-circle poll-img" src="{{ poll.user.profile.image.url }}" alt="profile picture">
         <small><p>created by 
@@ -8,19 +9,24 @@
         </p></small>
     </div>
     <div class="poll-controls">
+        <a href="{% url 'polls:results' object.id %}" class="btn btn-primary btn-sm mt-1 mb-1">Results</a>
         {% if object.user == user %}
-            <a href="{% url 'polls:update' object.id%}" class="btn btn-secondary btn-sm mt-1 mb-1">Update</a>
-            <a href="{% url 'polls:delete' object.id%}" class="btn btn-danger btn-sm mt-1 mb-1">Delete</a>
+            <a href="{% url 'polls:update' object.id %}" class="btn btn-secondary btn-sm mt-1 mb-1">Update</a>
+            <a href="{% url 'polls:delete' object.id %}" class="btn btn-danger btn-sm mt-1 mb-1">Delete</a>
+            <a href="download_votes/csv" class="btn btn-warning btn-sm mt-1 mb-1">Download (CSV)</a>
+            <a href="download_votes/json" class="btn btn-warning btn-sm mt-1 mb-1">Download (JSON)</a>
         {% endif %}
     </div>
+</div>
+<div class="content-section">
     <form action="{% url 'polls:vote' poll.id %}" method="post">
         {% csrf_token %}
         <fieldset>
-            <div class="poll-container">
+            <div class="container">
                 {% if no_name_error_message %}
                 <p><strong>{{ no_name_error_message }}</strong></p>{% endif %}
                 <h2>Name</h2>
-                <input type="text" name="voter_name" id="voter_name" placeholder="your name" maxlength="50">
+                <input type="text" name="voter_name" id="voter_name" placeholder="your name" maxlength="50" required>
                 <legend class="poll-title">
                     <h2>{{ poll.title }}</h2>
                     <small><p class="poll-description">{{ poll.description }}</p></small>
@@ -37,4 +43,5 @@
         <br>
         <input type="submit" value="Vote">
     </form>
+</div>
 {% endblock %}
