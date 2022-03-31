@@ -10,18 +10,19 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+from django.core.exceptions import ImproperlyConfigured
+import json
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Get secrets for credentials
-import os
-import json
-from django.core.exceptions import ImproperlyConfigured
 
 with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
     secrets = json.load(secrets_file)
+
 
 def get_secret(varname, secrets=secrets):
     """Get secret setting or fail with ImproperlyConfigured"""
@@ -33,13 +34,14 @@ def get_secret(varname, secrets=secrets):
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-m$@ibb##e^@_g1&0q8!7mf#_$1!be+u!f@#up6w#+5xm8+s&f7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -94,10 +96,10 @@ WSGI_APPLICATION = 'pollynesia_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pollynesia_db',
-        'USER': get_secret('PSQL_USER'),
-        'PASSWORD': get_secret('PSQL_PASSWORD'),
-        'HOST': '127.0.0.1',
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
