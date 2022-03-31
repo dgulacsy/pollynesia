@@ -73,9 +73,14 @@ class CreateView(LoginRequiredMixin, generic.CreateView):
             Poll, Choice, fields=('choice_text',), extra=3)
         super().__init__()
 
+    def init_location_by_ip(self, request):
+        ip = get_client_ip(request)
+        location_json = get_location_from_ip(ip)
+        return location_json['city'] if location_json else None
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = PollForm()
+        context['form'] = PollForm(initial={'location': self.init_location_by_ip(self.request) or 'Vienna'})
         context['formset'] = self.ChoiceFormset()
         return context
 
