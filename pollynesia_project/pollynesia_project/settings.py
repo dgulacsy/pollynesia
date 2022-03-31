@@ -39,7 +39,7 @@ SECRET_KEY = 'django-insecure-m$@ibb##e^@_g1&0q8!7mf#_$1!be+u!f@#up6w#+5xm8+s&f7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0']
 
 
 # Application definition
@@ -94,13 +94,24 @@ WSGI_APPLICATION = 'pollynesia_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pollynesia_db',
-        'USER': get_secret('PSQL_USER'),
-        'PASSWORD': get_secret('PSQL_PASSWORD'),
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'pollynesia_db',
+#         'USER': get_secret('PSQL_USER'),
+#         'PASSWORD': get_secret('PSQL_PASSWORD'),
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
