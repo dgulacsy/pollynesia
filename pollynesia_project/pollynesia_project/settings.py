@@ -41,6 +41,39 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0','127.0.0.1']
 
+#Logging Config
+LOGGING = {
+    'version': 1,                       # the dictConfig format version
+    'disable_existing_loggers': False,  # retain the default loggers
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'general.log',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'polls.views': {
+            'level': 'DEBUG',
+            'handlers': ['file'],
+        },
+        'polls.utils': {
+            'level': 'DEBUG',
+            'handlers': ['file'],
+        }
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+}
 
 # Application definition
 
@@ -158,9 +191,11 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Login Config
 LOGIN_REDIRECT_URL = 'polls:index'
 LOGIN_URL = 'login'
 
+# Email Config
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -169,5 +204,5 @@ EMAIL_HOST_USER = get_secret('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
 
 
-# Crispy settings
+# CrispyForms settings
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

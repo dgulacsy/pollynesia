@@ -1,3 +1,5 @@
+from .utils import download
+from .models import Poll, Choice, Vote
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
@@ -8,11 +10,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.forms import inlineformset_factory, ModelForm
+import logging
 
+logger = logging.getLogger(__name__)
 
-from .models import Poll, Choice, Vote
-
-from .utils import download
 
 class IndexView(generic.ListView):
     model = Poll
@@ -150,21 +151,20 @@ class DeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
 
 def vote(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
-    context = {
-        'poll': poll,
-    }
+    logger.info('initiating vote for %s', poll)
     try:
         voter_name = request.POST['voter_name']
         selected_choice = poll.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
+        logger.debug('No choice selected on form')
         messages.warning(request, 'Please select a choice!')
-        # context['selection_error_message'] = "You didn't select a choice"
-        # print(context)
         return HttpResponseRedirect(reverse('polls:detail', args=(poll.id,)))
     else:
         vote = Vote(choice=selected_choice, voter_name=voter_name)
         vote.save()
+        logger.info('added vote for %s', poll)
         return HttpResponseRedirect(reverse('polls:results', args=(poll.id,)))
+
 
 @login_required
 def download_votes(request, poll_id, format='csv'):
