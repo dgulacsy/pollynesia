@@ -1,6 +1,6 @@
 from .utils import download
 from .models import Poll, Choice, Vote
-from .api_consumer import get_client_ip, get_location_from_ip
+from .api_handler import get_client_ip, get_location_from_ip
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
@@ -22,11 +22,11 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_poll_list'
     paginate_by = 10
 
-    def get_queryset(self):
-        """Return the last 5 published polls of logged in user"""
-        return Poll.objects.filter(
-            pub_date__lte=timezone.now()
-        ).order_by('-pub_date')[:5]
+    # def get_queryset(self):
+    #     """Return the last 5 published polls of logged in user"""
+    #     return Poll.objects.filter(
+    #         pub_date__lte=timezone.now()
+    #     ).order_by('-pub_date')[:5]
 
 
 class UserIndexView(generic.ListView):
