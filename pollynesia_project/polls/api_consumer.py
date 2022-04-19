@@ -14,7 +14,7 @@ def get_client_ip(request):
         ip = x_forwarded_for.split(',')[0]
     else:
         ip = request.META.get('REMOTE_ADDR')
-    # WARNING: Using static dummy IPv6 instead of 'ip' to see IPStack API functionality
+    # WARNING: Using static dummy IPv6 instead of 'ip' to see IPStack API functionality as it would not work when run locally
     return '2001:4c4e:24c0:3700:b5d8:4c11:7106:8282'
 
 
