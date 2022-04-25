@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.forms import inlineformset_factory, ModelForm
+from django.db.models import Q
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,11 +23,11 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_poll_list'
     paginate_by = 10
 
-    # def get_queryset(self):
-    #     """Return the last 5 published polls of logged in user"""
-    #     return Poll.objects.filter(
-    #         pub_date__lte=timezone.now()
-    #     ).order_by('-pub_date')[:5]
+    def get_queryset(self):
+        now = timezone.now()
+        """Return open polls ordered by pub_date"""
+        return Poll.objects.filter(Q(open_from__lte=now), Q(close_at__gt=now) | Q(close_at__isnull=True)
+                                ).order_by('-pub_date')
 
 
 class UserIndexView(generic.ListView):
@@ -80,7 +81,8 @@ class CreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = PollForm(initial={'location': self.init_location_by_ip(self.request) or 'Vienna'})
+        context['form'] = PollForm(
+            initial={'location': self.init_location_by_ip(self.request) or 'Vienna'})
         context['formset'] = self.ChoiceFormset()
         return context
 
