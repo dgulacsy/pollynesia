@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.urls import reverse
 
+
 class Poll(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=500, blank=True)
@@ -47,7 +48,8 @@ class Vote(models.Model):
     timestamp = models.DateTimeField('vote timestamp', default=timezone.now)
     voter_name = models.CharField(max_length=50)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return '%s-%s' % (self.voter_name, self.choice)
